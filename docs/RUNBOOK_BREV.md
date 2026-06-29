@@ -17,7 +17,8 @@ this is pure execution. **Goal: minimize GPU hours.** Budget ~3–5 hours.
 git clone https://github.com/laknarayana9/llm-quantization-inference-benchmark.git
 cd llm-quantization-inference-benchmark
 python -m venv .venv && . .venv/bin/activate
-pip install -e ".[dev]"
+pip install --upgrade pip setuptools wheel   # needed: old pip/setuptools can't do PEP 660 editable installs
+pip install -e ".[dev]"                       # if this still errors on build_editable, drop the -e: pip install ".[dev]"
 pip install vllm            # pulls torch + CUDA wheels
 python -m pytest -m "not network" -q   # sanity: 36 tests pass on the GPU box too
 nvidia-smi                  # confirm GPU + driver
