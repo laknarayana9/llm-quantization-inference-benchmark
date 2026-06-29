@@ -12,23 +12,9 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import os
 
 from inferbench.client import complete
-from inferbench.models import EndpointConfig
-from inferbench.sweep import load_sweep, run_sweep
-
-
-def build_endpoints(sweep: dict) -> list[EndpointConfig]:
-    endpoints: list[EndpointConfig] = []
-    for e in sweep["endpoints"]:
-        api_key = os.environ.get(e["api_key_env"]) if e.get("api_key_env") else None
-        if e.get("api_key_env") and not api_key:
-            raise SystemExit(f"Missing env var {e['api_key_env']} for endpoint {e['name']}")
-        endpoints.append(EndpointConfig(
-            name=e["name"], base_url=e["base_url"], model=e["model"],
-            kind=e["kind"], api_key=api_key))
-    return endpoints
+from inferbench.sweep import load_sweep, run_sweep, build_endpoints
 
 
 def main() -> None:
@@ -50,7 +36,7 @@ def main() -> None:
     tok_model = sweep.get("tokenizer_model") or sweep["endpoints"][0]["model"]
     tokenizer = AutoTokenizer.from_pretrained(tok_model)
 
-    endpoints = build_endpoints(sweep)
+    endpoints = build_endpoints(sweep, kind="managed")
     cells = asyncio.run(run_sweep(sweep, endpoints, complete, tokenizer, args.results_dir))
     print(f"Wrote {len(cells)} cells to {args.results_dir}/")
 
