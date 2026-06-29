@@ -47,14 +47,14 @@ def _tokenizer(sweep: dict):
     return AutoTokenizer.from_pretrained(sweep.get("tokenizer_model") or sweep["endpoints"][0]["model"])
 
 
-async def _generate(ep, payloads, max_tokens) -> list[str]:
-    outs: list[str] = []
+async def _generate(ep, payloads, max_tokens):
+    results = []
     async with httpx.AsyncClient() as c:
         for msgs in payloads:
             # natural completions for quality: ignore_eos off, capture the text
             r = await complete(c, ep, msgs, max_tokens=max_tokens, ignore_eos=False, capture_text=True)
-            outs.append(r.text or "")
-    return outs
+            results.append(r)
+    return results
 
 
 def _make_managed_judge(sweep: dict):
@@ -80,10 +80,20 @@ def cmd_gen(args, sweep) -> None:
     eps = {e.name: e for e in build_endpoints(sweep, kind="self_host")}
     if args.config not in eps:
         raise SystemExit(f"config {args.config} not in self_host endpoints")
-    outs = asyncio.run(_generate(eps[args.config], payloads, max_tokens))
+    results = asyncio.run(_generate(eps[args.config], payloads, max_tokens))
+    n_ok = sum(1 for r in results if r.ok)
+    n_fail = len(results) - n_ok
+    sample_err = next((r.error for r in results if not r.ok), None)
+    if n_ok == 0:
+        raise SystemExit(
+            f"All {len(results)} requests FAILED for config '{args.config}'. Is its vLLM "
+            f"server up on the right port (bf16:8000 awq:8001 gptq:8002)? error: {sample_err}")
+    if n_fail:
+        print(f"WARNING: {n_fail}/{len(results)} requests failed (sample: {sample_err})")
+    outs = [r.text or "" for r in results]
     out = Path(args.results_dir) / f"outputs_{args.workload}_{args.config}.json"
     out.write_text(json.dumps(outs, indent=2))
-    print(f"Wrote {len(outs)} outputs to {out}")
+    print(f"Wrote {len(outs)} outputs to {out} ({n_ok} ok)")
 
 
 def cmd_score(args, sweep) -> None:
