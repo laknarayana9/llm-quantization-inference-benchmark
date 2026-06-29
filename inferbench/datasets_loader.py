@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 _DATA = Path(__file__).resolve().parent.parent / "datasets" / "data"
 
@@ -20,8 +20,9 @@ class SummaryItem(BaseModel):
 
 
 class StructuredItem(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     instruction: str
-    schema: dict
+    json_schema: dict = Field(alias="schema")
 
 
 def load_structured(n: int = 50) -> list[StructuredItem]:

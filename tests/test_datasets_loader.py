@@ -7,7 +7,7 @@ def test_structured_is_deterministic_and_has_schema():
     a = load_structured(n=5)
     b = load_structured(n=5)
     assert [x.instruction for x in a] == [x.instruction for x in b]
-    assert all(isinstance(x.schema, dict) and x.schema for x in a)
+    assert all(isinstance(x.json_schema, dict) and x.json_schema for x in a)
     assert len(a) == 5
 
 
