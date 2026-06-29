@@ -10,3 +10,4 @@ results/
 .env.local
 build/
 dist/
+INTERVIEW_PREP.md
