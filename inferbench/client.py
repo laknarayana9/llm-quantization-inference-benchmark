@@ -18,8 +18,11 @@ async def complete(client: httpx.AsyncClient, ep: EndpointConfig, messages: list
         "temperature": 0.0, "seed": seed, "stream": True,
         "stream_options": {"include_usage": True},
     }
-    if ignore_eos:
-        payload["ignore_eos"] = True  # honored by vLLM; ignored by managed APIs that reject it
+    # ignore_eos is a vLLM-only extension that forces fixed output length. Managed
+    # APIs (e.g. Token Factory) reject unknown params, so only send it to self-host
+    # endpoints. Managed output length is therefore not forced (documented limitation).
+    if ignore_eos and ep.kind == "self_host":
+        payload["ignore_eos"] = True
     start = time.perf_counter()
     ttft = None
     completion_tokens = 0
