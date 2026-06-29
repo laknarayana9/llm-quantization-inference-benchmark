@@ -41,6 +41,12 @@ The self-host endpoints are already uncommented in `configs/sweep.yaml`
 (bf16:8000, awq:8001, gptq:8002). Since you serve one format at a time, use
 `--only <name>` so the sweep targets just the live server (no dead-port errors).
 
+> **Always launch via the `serve/launch_*.sh` scripts** — never `vllm serve …` by
+> hand. The scripts pin `--max-model-len 8192`; omitting it makes vLLM provision
+> for Qwen's full 32k window, which changes KV-cache sizing, max concurrency, and
+> the OOM threshold — your "8k benchmark" would no longer be controlled or
+> comparable. See [serve/README.md](../serve/README.md) for the full rationale.
+
 For each format (`bf16`, `awq`, `gptq`):
 
 ```bash
