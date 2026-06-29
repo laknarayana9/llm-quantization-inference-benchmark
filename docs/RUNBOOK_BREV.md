@@ -23,15 +23,15 @@ pip install --upgrade pip wheel
 pip install "setuptools>=64,<82"   # >=64 for PEP 660 editable; <82 keeps torch 2.11 happy
 pip install ".[dev]"               # inferbench + light deps (non-editable; re-run after any git pull)
 
-python -c "import vllm; print('vllm', vllm.__version__)" || pip install vllm   # install only if missing
-python -m pytest -m "not network" -q   # sanity: 36 tests pass on the GPU box too
+python3 -c "import vllm; print('vllm', vllm.__version__)" || pip install vllm   # install only if missing
+python3 -m pytest -m "not network" -q   # sanity: 36 tests pass on the GPU box too
 nvidia-smi                  # confirm GPU + driver
 ```
 
 Pre-download the checkpoints so the first request doesn't stall:
 
 ```bash
-python - <<'EOF'
+python3 - <<'EOF'
 from huggingface_hub import snapshot_download
 for m in ["Qwen/Qwen2.5-7B-Instruct",
           "Qwen/Qwen2.5-7B-Instruct-AWQ",
@@ -60,8 +60,8 @@ bash serve/launch_awq.sh                          # (or _bf16 / _gptq)
 curl -s http://localhost:8001/v1/models | head    # verify it's up
 
 # terminal 2 — smoke first (cheap), then full; --only matches the running server
-python scripts/run_selfhost.py --only awq --reduced
-python scripts/run_selfhost.py --only awq
+python3 scripts/run_selfhost.py --only awq --reduced
+python3 scripts/run_selfhost.py --only awq
 # Ctrl-C the server in terminal 1 before starting the next format.
 ```
 
@@ -77,13 +77,13 @@ present and `NEBIUS_API_KEY` exported).
 
 ```bash
 # while each server is up (gen reuses the same prompts; ignore_eos off = natural length):
-python scripts/run_evals.py gen --workload rag --config bf16 --n 30   # bf16 server up
-python scripts/run_evals.py gen --workload rag --config awq  --n 30   # awq server up
-python scripts/run_evals.py gen --workload rag --config gptq --n 30   # gptq server up
+python3 scripts/run_evals.py gen --workload rag --config bf16 --n 30   # bf16 server up
+python3 scripts/run_evals.py gen --workload rag --config awq  --n 30   # awq server up
+python3 scripts/run_evals.py gen --workload rag --config gptq --n 30   # gptq server up
 
 # then score all three vs the baseline (needs NEBIUS_API_KEY for the judge):
 set -a; . ./.env.local; set +a
-python scripts/run_evals.py score --workload rag --configs bf16,awq,gptq --baseline bf16
+python3 scripts/run_evals.py score --workload rag --configs bf16,awq,gptq --baseline bf16
 # repeat for --workload chat (deterministic JSON, no judge) and summary.
 ```
 
