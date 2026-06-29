@@ -56,9 +56,13 @@ The self-host endpoints are already uncommented in `configs/sweep.yaml`
 For each format (`bf16`, `awq`, `gptq`):
 
 ```bash
-# terminal 1 — start the server, wait for "Application startup complete"
-bash serve/launch_awq.sh                          # (or _bf16 / _gptq)
+# terminal 1 — start the server (tee the log to capture the memory breakdown)
+bash serve/launch_awq.sh 2>&1 | tee /tmp/serve_awq.log   # (or _bf16 / _gptq)
+# wait for "Application startup complete", then in another shell:
 curl -s http://localhost:8001/v1/models | head    # verify it's up
+
+# capture the REAL quantization-memory story from the startup log:
+grep -iE "model weights take|GPU KV cache size|# GPU blocks|maximum concurrency" /tmp/serve_awq.log
 
 # terminal 2 — smoke first (cheap), then full; --only matches the running server
 python3 scripts/run_selfhost.py --only awq --reduced
@@ -66,8 +70,17 @@ python3 scripts/run_selfhost.py --only awq
 # Ctrl-C the server in terminal 1 before starting the next format.
 ```
 
+> **Two GPU-memory numbers, and why:** `results/*.json` `gpu_mem_gb` is the
+> `nvidia-smi` total — but with `--gpu-memory-utilization 0.90`, vLLM pre-reserves
+> ~90% of VRAM for KV cache regardless of model size, so it reads ~the same for all
+> three formats. The quantization-memory story lives in the **startup log**:
+> *"model weights take X GiB"* (BF16 ~15 vs AWQ/GPTQ ~6) and *"GPU KV cache size /
+> maximum concurrency"* (quantized formats leave room for more KV cache at the same
+> util). Record the grep output per format — those are the numbers for the report's
+> memory column.
+
 After all three: you'll have `results/{bf16,awq,gptq}_{chat,rag,summary}_{1,5,20,50}.json`
-with real `gpu_mem_gb` captured.
+plus the per-format weights/KV-cache figures from the logs.
 
 ## 3. Quality eval run (low concurrency, natural completions)
 
