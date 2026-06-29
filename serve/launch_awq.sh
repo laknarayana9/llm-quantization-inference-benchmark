@@ -6,7 +6,7 @@ export VLLM_USE_FLASHINFER_SAMPLER=0
 vllm serve Qwen/Qwen2.5-7B-Instruct-AWQ \
   --port 8001 \
   --quantization awq_marlin \
-  --max-model-len 8192 \
+  --max-model-len 9216 \
   --gpu-memory-utilization 0.90 \
   --max-num-seqs 64 \
   --enable-chunked-prefill

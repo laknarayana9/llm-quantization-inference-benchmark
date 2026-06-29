@@ -21,14 +21,16 @@ behavior or failure it controls:
 - **`--max-num-seqs 64`** — max sequences in the running batch (the concurrency
   cap at the engine). Raising it lifts throughput until VRAM/compute saturate;
   lowering it is the primary fix for KV-cache OOM at high concurrency.
-- **`--max-model-len 8192`** — context budget. **Do not omit this.** Qwen2.5-7B's
+- **`--max-model-len 9216`** — context budget. **Do not omit this.** Qwen2.5-7B's
   native window is 32,768 tokens, and vLLM sizes its KV-cache budget around
   `max-model-len`. Leaving it unset provisions the engine for 32k — fewer
   sequences fit per GB, a different `--max-num-seqs` ceiling, and a different OOM
   threshold — so an "8k benchmark" would actually run on a 32k-provisioned engine
   and the numbers wouldn't be comparable across configs or to the managed side.
-  Pinning it to 8192 (just above the 8k summary input + 500 output) makes KV-cache
-  sizing controlled and identical for BF16/AWQ/GPTQ.
+  It must cover **prompt + generation**: the summary workload is ~8k input + 500
+  output, and vLLM returns HTTP 400 if `prompt + max_tokens` exceeds this — so
+  9216 (8k input + 500 output + headroom) keeps it tightly controlled while
+  fitting the largest workload, identically for BF16/AWQ/GPTQ.
 - **`--enable-chunked-prefill`** — interleaves long-prompt prefill with ongoing
   decode so one 8k-token prefill doesn't stall everyone else's token generation.
   Big win for the long-context (summary) workload's tail latency.
