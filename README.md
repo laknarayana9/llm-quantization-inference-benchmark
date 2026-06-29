@@ -27,6 +27,8 @@ vendor claims.
   serving performance.
 - **Int4 is ~2.5× faster than BF16** at high concurrency (chat @50: 4,549 vs 1,810
   tok/s) — the weight-only-Int4 win on decode memory bandwidth.
+- **TTFT (time-to-first-token) is 0.02–0.17s self-hosted** vs **~1.0–1.2s managed**
+  — a 7–50× responsiveness gap (local serving + no internet round-trip).
 - **Memory:** Int4 weights are 5.3 GiB vs BF16's 14.3 GiB; at the same GPU
   utilization that frees ~39% more KV cache (632k vs 455k tokens → **68× vs 50×**
   concurrent full-context sequences).
@@ -135,6 +137,19 @@ crossover at scale.
   captured but is performance-identical to AWQ; chat JSON-validity and summary
   scoring are wired but not yet run across all formats.
 - **Single L40S, no tensor-parallel** (7B doesn't need it).
+
+## Repository structure
+
+```
+inferbench/        # the toolkit (typed models, metrics, async client, runner,
+                   #   workloads, evals, cost/SLO/charts) — 36 unit tests
+serve/             # vLLM launch scripts (BF16/AWQ/GPTQ) + tuning rationale
+scripts/           # run_managed · run_selfhost · run_evals · generate_report
+configs/           # sweep.yaml (matrix + endpoints), slo.yaml
+results/           # committed per-cell JSON + memory notes + quality scores
+report/charts/     # generated hero charts
+docs/              # spec, plans, learning guide, testing guide, GPU runbook
+```
 
 ## Reproduce
 
