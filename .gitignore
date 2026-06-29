@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.venv/
+results/
+datasets/data/*.json
+!datasets/data/structured_prompts.json
+.pytest_cache/
+.DS_Store
+*.egg-info/
