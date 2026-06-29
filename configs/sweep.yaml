@@ -1,5 +1,12 @@
+# Canonical tokenizer for prompt-shaping (used for ALL configs so every endpoint
+# receives identical prompt text; each endpoint still reports its own token usage).
+tokenizer_model: "Qwen/Qwen2.5-7B-Instruct"
 endpoints:
-  - {name: managed, base_url: "https://api.studio.nebius.ai/v1", model: "Qwen/Qwen2.5-7B-Instruct", kind: managed, api_key_env: NEBIUS_API_KEY}
+  # Managed reference: Nebius Token Factory does not offer Qwen2.5-7B, so we use the
+  # closest efficient instruct model (Qwen3-30B-A3B, MoE ~3B active). This makes the
+  # managed comparison "self-hosted small quantized vs managed larger model" — a real
+  # procurement question, not a same-model serving comparison (documented limitation).
+  - {name: managed, base_url: "https://api.studio.nebius.ai/v1", model: "Qwen/Qwen3-30B-A3B-Instruct-2507", kind: managed, api_key_env: NEBIUS_API_KEY}
   # self-host endpoints (added in the self-host phase):
   # - {name: bf16, base_url: "http://localhost:8000/v1", model: "Qwen/Qwen2.5-7B-Instruct", kind: self_host}
   # - {name: awq,  base_url: "http://localhost:8001/v1", model: "Qwen/Qwen2.5-7B-Instruct-AWQ", kind: self_host}

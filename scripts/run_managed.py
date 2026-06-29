@@ -44,10 +44,11 @@ def main() -> None:
         sweep["n"] = 10
         sweep["concurrency"] = [1, 5]
 
-    # Real tokenizer for the model under test (used to shape prompts to token targets).
+    # Canonical tokenizer for prompt-shaping: configurable so every config (self-host
+    # and managed) shapes from identical text. Falls back to the first endpoint's model.
     from transformers import AutoTokenizer
-    model_id = sweep["endpoints"][0]["model"]
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    tok_model = sweep.get("tokenizer_model") or sweep["endpoints"][0]["model"]
+    tokenizer = AutoTokenizer.from_pretrained(tok_model)
 
     endpoints = build_endpoints(sweep)
     cells = asyncio.run(run_sweep(sweep, endpoints, complete, tokenizer, args.results_dir))

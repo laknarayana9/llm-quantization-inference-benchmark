@@ -53,10 +53,14 @@ def load_summary(n: int = 50, seed: int = 1234) -> list[SummaryItem]:
     # govreport: long government reports (often 8k+ tokens) — script-free parquet,
     # well-suited to the long-context summary workload. Columns: report, summary.
     ds = load_dataset("ccdv/govreport-summarization", split="validation")
+    # Only keep documents long enough to fill the 8k-token summary workload after
+    # shaping (>= ~40k chars ≈ >= ~8k tokens; shorter docs would under-fill the
+    # long-context target). Deterministic: first N qualifying docs in dataset order.
+    MIN_CHARS = 40_000
     picked: list[SummaryItem] = []
     for i in range(len(ds)):
         row = ds[i]
-        if row["report"].strip():
+        if row["report"].strip() and len(row["report"]) >= MIN_CHARS:
             picked.append(SummaryItem(document=row["report"], reference=row["summary"]))
         if len(picked) >= n:
             break
