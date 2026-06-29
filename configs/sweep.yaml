@@ -7,7 +7,7 @@ endpoints:
   # managed comparison "self-hosted small quantized vs managed larger model" — a real
   # procurement question, not a same-model serving comparison (documented limitation).
   - {name: managed, base_url: "https://api.studio.nebius.ai/v1", model: "Qwen/Qwen3-30B-A3B-Instruct-2507", kind: managed, api_key_env: NEBIUS_API_KEY}
-  # Self-host endpoints  — run_selfhost.py picks these up; run_managed.py
+  # Self-host endpoints — run_selfhost.py picks these up; run_managed.py
   # filters by kind so it ignores them. Start the matching vLLM server first.
   - {name: bf16, base_url: "http://localhost:8000/v1", model: "Qwen/Qwen2.5-7B-Instruct", kind: self_host}
   - {name: awq,  base_url: "http://localhost:8001/v1", model: "Qwen/Qwen2.5-7B-Instruct-AWQ", kind: self_host}

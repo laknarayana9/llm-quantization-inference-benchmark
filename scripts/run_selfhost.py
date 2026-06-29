@@ -1,4 +1,4 @@
-"""Run the benchmark sweep against self-hosted vLLM endpoints (the self-host phase, GPU host).
+"""Run the benchmark sweep against self-hosted vLLM endpoints (GPU host).
 
 Assumes vLLM servers are already running (see serve/launch_*.sh) and the
 self-host endpoints are uncommented in the sweep config. Captures GPU memory via

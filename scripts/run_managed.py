@@ -1,6 +1,6 @@
 """Run the benchmark sweep against real OpenAI-compatible endpoints.
 
-In This targets the managed Nebius Token Factory endpoint. Requires the
+This targets the managed Nebius Token Factory endpoint. Requires the
 API key in the environment variable named by each endpoint's `api_key_env`.
 
 Usage:

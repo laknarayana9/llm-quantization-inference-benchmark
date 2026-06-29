@@ -168,6 +168,6 @@ python scripts/run_selfhost.py --only awq
 python scripts/generate_report.py --gpu-hr 1.06 --managed-per-1m 0.30
 ```
 
-Design, plan, methodology deep-dive, and the concept/reference guide are in
-[`docs/`](docs/): [spec](docs/DESIGN.md),
+Design rationale, methodology, and operational notes are in
+[`docs/`](docs/): [design](docs/DESIGN.md),
 [testing & results](docs/TESTING.md), [GPU runbook](docs/RUNBOOK_BREV.md).

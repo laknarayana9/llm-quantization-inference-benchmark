@@ -118,7 +118,7 @@ Each file is a serialized `CellResult` (`inferbench/models.py`). Realistic shape
 Notes:
 - **`gpu_mem_gb` is `null` for managed cells** — the managed GPU is not
   observable (the black-box limitation). Self-host cells populate it from
-  `nvidia-smi` .
+  `nvidia-smi`.
 - **`raw`** keeps every per-request record, so any new statistic (a different
   percentile, a histogram) can be recomputed from saved JSON **without re-running**
   the benchmark.
@@ -153,12 +153,11 @@ git add -f results/managed_*.json && git commit -m "chore: managed benchmark res
 `--reduced` runs a quick smoke (n=10, concurrency [1,5]) to confirm the endpoint
 works before committing to the full 3-workload × 4-concurrency sweep.
 
-### Self-host (Self-host — needs a GPU)
+### Self-host (needs a GPU)
 
 Uncomment the self-host endpoints in `configs/sweep.yaml`, start the vLLM servers
-(`serve/launch_*.sh`), then run `scripts/run_selfhost.py` (the sweep step), which
-also captures GPU memory via `nvidia-smi`. See
-[the self-host phase](docs/RUNBOOK_BREV.md).
+(`serve/launch_*.sh`), then run `scripts/run_selfhost.py`, which also captures GPU
+memory via `nvidia-smi`. See the [GPU runbook](RUNBOOK_BREV.md) for the full flow.
 
 ---
 
@@ -170,7 +169,7 @@ A result is only credible if someone else can regenerate it. This repo captures:
   every run.
 - **Fixed seed** (`1234`) and `temperature: 0.0`.
 - **Committed raw results** (`raw` per request) so statistics can be recomputed.
-- **Environment metadata** (the run records GPU type, CUDA/driver version, vLLM
+- **Environment metadata** (GPU type, CUDA/driver version, vLLM
   version, checkpoint commit hashes alongside the results).
 - **Generated report** — the README table is produced from `results/*.json`, never
   hand-typed, so it cannot drift from what was actually measured.

@@ -1,4 +1,4 @@
-"""Quality-eval run (the eval step). Two steps to fit one-server-at-a-time serving:
+"""Quality-eval run. Two steps to fit one-server-at-a-time serving:
 
   # while each self-host server is up, generate its outputs (natural completions):
   python scripts/run_evals.py gen --workload rag --config bf16 --n 30

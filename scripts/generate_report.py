@@ -1,4 +1,4 @@
-"""Generate hero charts from committed results (the report step).
+"""Generate hero charts from committed results.
 
 Loads results/*.json, computes the self-host-vs-managed cost crossover, and
 renders the report charts into report/charts/. Cost inputs are CLI flags so the

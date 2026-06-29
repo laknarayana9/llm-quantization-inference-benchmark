@@ -51,7 +51,7 @@ curl -s http://localhost:8000/v1/models | head
 
 See [the Brev runbook](../docs/RUNBOOK_BREV.md) for the full GPU session flow.
 
-## Failure-mode experiments (the OOM experiment)
+## Failure-mode experiments
 
 To reproduce the KV-cache OOM deliberately, raise `--max-num-seqs` (e.g. 256) and
 run the 8k summary workload at concurrency 50 — then show the fix (lower

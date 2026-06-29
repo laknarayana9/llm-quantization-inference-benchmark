@@ -1,4 +1,4 @@
-# Brev GPU Runbook — Self-Host Sweep 
+# Brev GPU Runbook — Self-Host Sweep
 
 Step-by-step for the ~$20 Brev session. Everything is pre-built and tested, so
 this is pure execution. **Goal: minimize GPU hours.** Budget ~3–5 hours.
@@ -8,7 +8,7 @@ this is pure execution. **Goal: minimize GPU hours.** Budget ~3–5 hours.
 - **L40S (48GB)** — best fit. BF16-7B (~15GB) + KV cache for 8k×high-concurrency
   fits comfortably; AWQ/GPTQ (~6GB) leave tons of headroom.
 - **A10G / A100-40GB** also fine. On a **24GB** card, BF16 at 8k×50 may OOM — which
-  is the Task 6 OOM experiment, so that's acceptable (use it intentionally).
+  is the OOM experiment, so that's acceptable (use it intentionally).
 - One GPU; no tensor-parallel (7B doesn't need it).
 
 ## 1. Set up the box (~15 min)
@@ -117,7 +117,7 @@ python3 scripts/run_evals.py score --workload rag --configs bf16,awq,gptq --base
 This writes `results/quality_<workload>.json` with each config's mean score and
 **% retained vs the BF16 baseline** — your quantization-quality-degradation numbers.
 
-## 4. Failure-mode experiments (Task 6)
+## 4. Failure-mode experiments
 
 - **OOM:** edit `serve/launch_bf16.sh` to `--max-num-seqs 256`, run the 8k summary
   at concurrency 50, capture the OOM, then show the fix. Record in
@@ -126,7 +126,7 @@ This writes `results/quality_<workload>.json` with each config's mean score and
 
 ## 5. Generate report (can be done off-GPU after)
 
-Pull the committed results back and run the report step (`scripts/generate_report.py`)
+Pull the committed results back and run `scripts/generate_report.py`
 to render the hero charts + README. Plug in the real Brev GPU $/hr and Token
 Factory price for the cost crossover.
 

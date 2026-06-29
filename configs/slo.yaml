@@ -1,6 +1,6 @@
 # SLO profile thresholds.
 # Thresholds are DRIVEN BY customer/product requirements and validated for
-# feasibility against the BF16 baseline run . Null = not enforced.
+# feasibility against the BF16 baseline run. Null = not enforced.
 chat:    {error_rate_max: 0.01, ttft_max_s: null, p95_max_s: null, quality_min: null}
 rag:     {error_rate_max: 0.01, ttft_max_s: null, p95_max_s: null, quality_min: null}
 summary: {error_rate_max: 0.01, ttft_max_s: null, p95_max_s: null, quality_min: null}
