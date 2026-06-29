@@ -8,3 +8,5 @@ results/
 *.egg-info/
 .env
 .env.local
+build/
+dist/
