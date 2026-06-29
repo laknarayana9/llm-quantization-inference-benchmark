@@ -55,20 +55,33 @@ The self-host endpoints are already uncommented in `configs/sweep.yaml`
 
 For each format (`bf16`, `awq`, `gptq`):
 
+Single-terminal flow (run the server in the **background** so the same shell can
+drive the client — no second SSH session needed). Example for AWQ (port 8001):
+
 ```bash
-# terminal 1 — start the server (tee the log to capture the memory breakdown)
-bash serve/launch_awq.sh 2>&1 | tee /tmp/serve_awq.log   # (or _bf16 / _gptq)
-# wait for "Application startup complete", then in another shell:
-curl -s http://localhost:8001/v1/models | head    # verify it's up
+pkill -f "vllm serve" 2>/dev/null; sleep 3        # clear any stale server first
 
-# capture the REAL quantization-memory story from the startup log:
-grep -iE "model weights take|GPU KV cache size|# GPU blocks|maximum concurrency" /tmp/serve_awq.log
+# start the server in the background, logging to a file
+bash serve/launch_awq.sh > /tmp/serve_awq.log 2>&1 &
 
-# terminal 2 — smoke first (cheap), then full; --only matches the running server
+# wait until it's actually ready (first load takes ~30-60s)
+until curl -s http://localhost:8001/v1/models >/dev/null 2>&1; do echo "waiting..."; sleep 5; done
+echo "AWQ READY"
+
+# capture the REAL quantization-memory story from the log:
+grep -iE "model weights take|GPU KV cache size|maximum concurrency" /tmp/serve_awq.log
+
+# run the perf sweep (smoke first, then full) against the live server
 python3 scripts/run_selfhost.py --only awq --reduced
 python3 scripts/run_selfhost.py --only awq
-# Ctrl-C the server in terminal 1 before starting the next format.
+
+pkill -f "vllm serve"                              # stop before switching format
 ```
+
+For BF16 use `launch_bf16.sh` / port 8000 / `--only bf16`; GPTQ uses
+`launch_gptq.sh` / port 8002 / `--only gptq`. **The server must stay alive the
+whole time you run client commands** — backgrounding it (`&`) is what lets one
+terminal do both.
 
 > **Two GPU-memory numbers, and why:** `results/*.json` `gpu_mem_gb` is the
 > `nvidia-smi` total — but with `--gpu-memory-utilization 0.90`, vLLM pre-reserves
