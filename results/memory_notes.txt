@@ -1,0 +1,16 @@
+=== AWQ ===
+(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1744] GPU KV cache size: 632,160 tokens
+(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 68.59x
+=== AWQ ===
+(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1744] GPU KV cache size: 632,160 tokens
+(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 68.59x
+=== AWQ ===
+(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1744] GPU KV cache size: 632,160 tokens
+(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 68.59x
+=== BF16 ===
+(EngineCore pid=22490) INFO 06-29 21:13:18 [kv_cache_utils.py:1744] GPU KV cache size: 455,184 tokens
+(EngineCore pid=22490) INFO 06-29 21:13:18 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 49.39x
+=== BF16 ===
+(EngineCore pid=26185) INFO 06-29 21:39:48 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 50.97x
+=== GPTQ ===
+(EngineCore pid=26838) INFO 06-29 21:43:19 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 67.04x
