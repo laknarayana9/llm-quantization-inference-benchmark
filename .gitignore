@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 .venv/
 results/
+!results/.gitkeep
 datasets/data/*.json
 !datasets/data/structured_prompts.json
 .pytest_cache/

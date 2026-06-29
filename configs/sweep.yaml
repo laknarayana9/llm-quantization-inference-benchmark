@@ -1,0 +1,12 @@
+endpoints:
+  - {name: managed, base_url: "https://api.studio.nebius.ai/v1", model: "Qwen/Qwen2.5-7B-Instruct", kind: managed, api_key_env: NEBIUS_API_KEY}
+  # self-host endpoints (added in the self-host phase):
+  # - {name: bf16, base_url: "http://localhost:8000/v1", model: "Qwen/Qwen2.5-7B-Instruct", kind: self_host}
+  # - {name: awq,  base_url: "http://localhost:8001/v1", model: "Qwen/Qwen2.5-7B-Instruct-AWQ", kind: self_host}
+  # - {name: gptq, base_url: "http://localhost:8002/v1", model: "Qwen/Qwen2.5-7B-Instruct-GPTQ-Int4", kind: self_host}
+workloads: [chat, rag, summary]
+concurrency: [1, 5, 20, 50]
+warmup: 5
+n: 50
+seed: 1234
+max_tokens: {chat: 100, rag: 300, summary: 500}
