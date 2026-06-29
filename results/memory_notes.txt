@@ -1,16 +1,21 @@
-=== AWQ ===
-(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1744] GPU KV cache size: 632,160 tokens
-(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 68.59x
-=== AWQ ===
-(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1744] GPU KV cache size: 632,160 tokens
-(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 68.59x
-=== AWQ ===
-(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1744] GPU KV cache size: 632,160 tokens
-(EngineCore pid=18352) INFO 06-29 20:42:24 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 68.59x
-=== BF16 ===
-(EngineCore pid=22490) INFO 06-29 21:13:18 [kv_cache_utils.py:1744] GPU KV cache size: 455,184 tokens
-(EngineCore pid=22490) INFO 06-29 21:13:18 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 49.39x
-=== BF16 ===
-(EngineCore pid=26185) INFO 06-29 21:39:48 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 50.97x
-=== GPTQ ===
-(EngineCore pid=26838) INFO 06-29 21:43:19 [kv_cache_utils.py:1745] Maximum concurrency for 9,216 tokens per request: 67.04x
+# Self-host GPU memory — captured from vLLM startup logs
+# Hardware: NVIDIA L40S (48 GiB), vLLM 0.23.0
+# Server config: --max-model-len 9216, --gpu-memory-utilization 0.90, --max-num-seqs 64
+
+Format | Model weights | KV cache size    | Max concurrency (9216-tok requests)
+-------|---------------|------------------|-------------------------------------
+BF16   | 14.29 GiB     | 455,184 tokens   | 49.4-51.0x
+AWQ    |  5.29 GiB     | 632,160 tokens   | 68.6x
+GPTQ   |  5.27 GiB     | (~AWQ)           | 67.0x
+
+Takeaways:
+- Weights: INT4 (AWQ/GPTQ) are ~2.7x smaller than BF16 (5.3 vs 14.3 GiB).
+- KV-cache headroom: at the same 0.90 GPU-mem utilization, INT4 fits ~39% more
+  KV-cache tokens (632k vs 455k), i.e. ~68x vs ~50x concurrent full-context
+  sequences — the freed weight memory becomes KV-cache capacity.
+- AWQ vs GPTQ: indistinguishable on both weights and KV headroom.
+
+Note: nvidia-smi total (~40 GiB, in results/*.json gpu_mem_gb) is ~the same for
+all formats because --gpu-memory-utilization 0.90 pre-reserves ~90% of VRAM
+regardless of model size; the quantization benefit shows up as weights size and
+KV-cache headroom above, not in the nvidia-smi total.
