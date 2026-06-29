@@ -59,10 +59,25 @@ with real `gpu_mem_gb` captured.
 
 ## 3. Quality eval run (low concurrency, natural completions)
 
-Collect real outputs and score them. Use a strong judge model (e.g. via the
-managed Token Factory you already have a key for — point `api_complete_fn` at a
-larger Qwen3 model). This is the eval step's `scripts/run_evals.py` (write it from
-`inferbench.evals.run.score_outputs` + `capture_text=True`, `ignore_eos=False`).
+`scripts/run_evals.py` is ready. Two steps fit the one-server-at-a-time flow:
+generate each config's outputs while its server is up, then score them all at the
+end (the judge calls your managed Token Factory endpoint, so keep `.env.local`
+present and `NEBIUS_API_KEY` exported).
+
+```bash
+# while each server is up (gen reuses the same prompts; ignore_eos off = natural length):
+python scripts/run_evals.py gen --workload rag --config bf16 --n 30   # bf16 server up
+python scripts/run_evals.py gen --workload rag --config awq  --n 30   # awq server up
+python scripts/run_evals.py gen --workload rag --config gptq --n 30   # gptq server up
+
+# then score all three vs the baseline (needs NEBIUS_API_KEY for the judge):
+set -a; . ./.env.local; set +a
+python scripts/run_evals.py score --workload rag --configs bf16,awq,gptq --baseline bf16
+# repeat for --workload chat (deterministic JSON, no judge) and summary.
+```
+
+This writes `results/quality_<workload>.json` with each config's mean score and
+**% retained vs the BF16 baseline** — your quantization-quality-degradation numbers.
 
 ## 4. Failure-mode experiments (Task 6)
 
