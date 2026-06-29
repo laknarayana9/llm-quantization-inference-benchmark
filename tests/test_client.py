@@ -47,6 +47,26 @@ async def test_ignore_eos_only_sent_to_self_host():
 
 
 @respx.mock
+async def test_complete_captures_text_when_requested():
+    respx.post("http://x/v1/chat/completions").mock(
+        return_value=httpx.Response(200, text=SSE, headers={"content-type": "text/event-stream"}))
+    ep = EndpointConfig(name="t", base_url="http://x/v1", model="m", kind="managed")
+    async with httpx.AsyncClient() as c:
+        r = await complete(c, ep, [{"role": "user", "content": "hi"}], max_tokens=2, capture_text=True)
+    assert r.text == "Hello world"
+
+
+@respx.mock
+async def test_complete_omits_text_by_default():
+    respx.post("http://x/v1/chat/completions").mock(
+        return_value=httpx.Response(200, text=SSE, headers={"content-type": "text/event-stream"}))
+    ep = EndpointConfig(name="t", base_url="http://x/v1", model="m", kind="managed")
+    async with httpx.AsyncClient() as c:
+        r = await complete(c, ep, [{"role": "user", "content": "hi"}], max_tokens=2)
+    assert r.text is None
+
+
+@respx.mock
 async def test_complete_records_http_error():
     respx.post("http://x/v1/chat/completions").mock(return_value=httpx.Response(500, text="boom"))
     ep = EndpointConfig(name="t", base_url="http://x/v1", model="m", kind="managed")

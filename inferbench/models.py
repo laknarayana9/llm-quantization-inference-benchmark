@@ -20,6 +20,7 @@ class RequestResult(BaseModel):
     completion_tokens: int
     ttft_s: float | None = None
     error: str | None = None
+    text: str | None = None
 
 
 class SweepCell(BaseModel):
