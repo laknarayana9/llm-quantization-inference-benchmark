@@ -23,6 +23,9 @@ def main() -> None:
     ap.add_argument("--sweep", default="configs/sweep.yaml")
     ap.add_argument("--results-dir", default="results")
     ap.add_argument("--gpu-index", type=int, default=0)
+    ap.add_argument("--only", default=None,
+                    help="run only the endpoint with this name (e.g. awq) — use when "
+                         "serving one format at a time")
     ap.add_argument("--reduced", action="store_true",
                     help="smoke run: n=10, concurrency [1, 5]")
     args = ap.parse_args()
@@ -37,8 +40,12 @@ def main() -> None:
     tokenizer = AutoTokenizer.from_pretrained(tok_model)
 
     endpoints = build_endpoints(sweep, kind="self_host")
+    if args.only:
+        endpoints = [e for e in endpoints if e.name == args.only]
     if not endpoints:
-        raise SystemExit("No self_host endpoints in sweep config — uncomment them in configs/sweep.yaml")
+        raise SystemExit(
+            f"No matching self_host endpoints (--only={args.only}). "
+            "Check configs/sweep.yaml.")
 
     gpu_mem_fn = make_gpu_mem_fn(args.gpu_index)
     cells = asyncio.run(run_sweep(sweep, endpoints, complete, tokenizer, args.results_dir,
