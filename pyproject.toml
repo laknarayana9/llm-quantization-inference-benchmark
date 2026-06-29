@@ -22,6 +22,9 @@ markers = ["network: requires dataset/API download"]
 [tool.setuptools.packages.find]
 include = ["inferbench*"]
 
+[tool.setuptools.package-data]
+inferbench = ["data/*.json"]
+
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
