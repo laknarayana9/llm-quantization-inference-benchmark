@@ -34,7 +34,7 @@ def load_structured(n: int = 50) -> list[StructuredItem]:
 def load_rag(n: int = 50, seed: int = 1234) -> list[RagItem]:
     from datasets import load_dataset
 
-    ds = load_dataset("squad_v2", split="validation")
+    ds = load_dataset("rajpurkar/squad_v2", split="validation")
     # Fixed deterministic indices: walk in order, take answerable examples.
     picked: list[RagItem] = []
     for i in range(len(ds)):
@@ -50,12 +50,14 @@ def load_rag(n: int = 50, seed: int = 1234) -> list[RagItem]:
 def load_summary(n: int = 50, seed: int = 1234) -> list[SummaryItem]:
     from datasets import load_dataset
 
-    ds = load_dataset("multi_news", split="validation")
+    # govreport: long government reports (often 8k+ tokens) — script-free parquet,
+    # well-suited to the long-context summary workload. Columns: report, summary.
+    ds = load_dataset("ccdv/govreport-summarization", split="validation")
     picked: list[SummaryItem] = []
     for i in range(len(ds)):
         row = ds[i]
-        if row["document"].strip():
-            picked.append(SummaryItem(document=row["document"], reference=row["summary"]))
+        if row["report"].strip():
+            picked.append(SummaryItem(document=row["report"], reference=row["summary"]))
         if len(picked) >= n:
             break
     return picked
